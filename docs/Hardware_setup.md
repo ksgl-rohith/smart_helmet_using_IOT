@@ -1,31 +1,16 @@
-# Hardware & Wiring Guide
+# Smart Helmet – Hardware Notes
 
-## 1️⃣ Power
-- Arduino + MPU6050 + GPS → 5V
-- SIM800L needs stable **4V 2A** (use buck converter)
-- WS2812B LEDs → 5V + common GND
+## Power Tips
+- ESP32 uses 3.3V
+- GPS works on 5V
+- SIM800L **must use 4V @ 2A**
+  - Use buck converter **LM2596** or **AMS1117 + capacitor bank**
+- WS2812B needs clean 5V & common ground
 
-## 2️⃣ Connections
-MPU6050  
-- VCC → 5V  
-- GND → GND  
-- SDA → A4  
-- SCL → A5
+## GPS Placement
+- Mount near helmet top or visor
+- Avoid metal shielding over antenna
 
-GPS NEO-6M  
-- VCC → 5V  
-- TX → D4  
-- RX → D3  
-
-SIM800L  
-- VCC → 4V regulated  
-- TX → D8  
-- RX → D7  
-- GND → Common
-
-WS2812B  
-- DIN → D6  
-- VCC → 5V  
-- GND → Common
-
-Buzzer → D9
+## SIM800L SIM Tips
+- Use 4G SIM — supports 2G fallback
+- Disable PIN lock before inserting SIM
