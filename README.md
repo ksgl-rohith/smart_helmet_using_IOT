@@ -1,46 +1,89 @@
-# Smart Helmet – Accident Detection, Alert & Navigation
+# Smart Helmet – Accident Detection, SOS & Navigation (ESP32)
 
-A safety-focused Smart Helmet built using **Arduino**, **MPU6050**, **GPS**, **SIM800L**, and **WS2812B LEDs**.  
-It detects vehicle accidents, sends emergency alerts via SMS, warns about over-speeding, and provides automatic turn indication based on head tilt.  
-Also features a 4-second LED startup animation.
+A safety-focused Smart Helmet using **ESP32**, **MPU6050**, **GPS NEO-6M**, **SIM800L**, and **WS2812B RGB LEDs**.
+
+Features real-time tilt-based indications, crash alerts with GPS
+coordinates, SOS button-triggered help messages, and over-speed alarms.
 
 ---
 
 ## Features
 
-### Accident Detection
-- Detects sudden impact/jerk using **MPU6050**
-- Sends SMS with location to emergency contact
-- Auto-trigger SMS if rider loses consciousness
+### Crash Detection & SOS
+- Detects sudden acceleration spike using MPU6050
+- Automatically sends SMS with **Google Maps link**
+- Manual triple-button-click SOS option
 
-### Live Location Tracking (GPS)
-- Reads latitude & longitude from **NEO-6M GPS**
-- Shares location via SIM800L when crash detected
+### Live GPS + Speed Alerts
+- Reads coordinates from NEO-6M
+- Calculates speed
+- Sends SMS when speed crosses limit
 
-### Overspeed Warning
-- Speed calculated from GPS coordinates
-- Triggers buzzer + LED warning over threshold
+### Auto Turn Indicators via Tilt
+- Lean right → Right LED panel glows
+- Lean left → Left panel glows
+- Straight posture turns lights OFF
 
-### Head-Tilt based Indicators
-- Lean **left/right** = Turn indicators ON
-- Comes back upright = OFF
-
-### LED Boot Animation
-- WS2812B LEDs display attractive pattern for 4 seconds on power-up
+### LED Helmet Animation
+- 5-second startup pulse animation using WS2812B
 
 ---
 
 ## Hardware Components
+
 | Component | Purpose |
 |----------|----------|
-| Arduino Uno/Nano | Main controller |
-| MPU6050 | Tilt + acceleration sensor |
-| NEO-6M GPS | Speed + coordinates |
-| SIM800L/SIM900A | SMS alerts |
-| Relay Module | Ignition control (optional) |
-| WS2812B LED strip | Indicators & animation |
+| ESP32 Dev Kit | Main controller |
+| MPU6050 | Crash + tilt detection |
+| NEO-6M GPS | Location + speed |
+| SIM800L | SMS messaging |
+| WS2812B LED strip (60 LEDs) | Indicators + animations |
 | Buzzer | Alerts |
-| Helmet | Fitting all electronics |
+| Push Button (SOS) | Triple click → emergency |
+| Helmet Shell | Assembly |
+
+---
+
+## Wiring / Connections (ESP32)
+
+### **MPU6050**
+```
+VCC → 3.3V/5V
+GND → GND
+SDA → GPIO21
+SCL → GPIO22
+```
+
+### **GPS NEO-6M**
+```
+VCC → 5V
+GND → GND
+TX  → GPIO17 (ESP RX)
+RX  → GPIO16 (ESP TX)
+```
+
+### **SIM800L**
+Needs **4V & 2A** power (not 5V!)
+```
+VCC → 4V regulator output
+GND → Common Ground
+TX  → GPIO27 (ESP RX)
+RX  → GPIO26 (ESP TX)
+```
+
+### **WS2812B LEDs**
+```
+DIN → GPIO27
+VCC → 5V
+GND → Common Ground
+```
+
+### **Others**
+```
+Buzzer       → GPIO33
+Status LED   → GPIO25
+SOS Button   → GPIO32 (PULLUP)
+```
 
 ---
 
@@ -49,67 +92,45 @@ Also features a 4-second LED startup animation.
 ```
 smart-helmet/
 │
-├── /arduino-code
+├── arduino-code/
 │   └── smart_helmet.ino
 │
-├── /assets
-│   ├── circuit-diagram.png
-│   └── demo-video.gif 
-│
-├── /docs
+├── docs/
 │   ├── hardware-setup.md
 │   └── future-improvements.md
+│
+├── assets/
+│   └── circuit-diagram.png
 ├── .gitignore
 └── README.md
 ```
 
 ---
 
-## Arduino Libraries Used
-- `Wire.h`
-- `Adafruit_MPU6050.h`
-- `Adafruit_Sensor.h`
-- `TinyGPS++.h`
-- `SoftwareSerial.h`
-- `Adafruit_NeoPixel.h`
-
-Install from **Arduino Library Manager**.
-
----
-
-## How it Works (Flow)
-1. System boots → LED startup animation plays  
-2. Continuously reads:
-   - Tilt angle
-   - Acceleration (crash)
-   - GPS speed + location
-3. If crash detected → Send SMS to emergency contact  
-4. If speed > limit → Sound buzzer + flash LEDs  
-5. Detect head tilt → Activate left/right indicators  
-6. Reset automatically when bike upright
+## Flashing Instructions
+1. Open Arduino IDE 2.x
+2. Install board **ESP32 Dev Module**
+3. Install required libraries:
+   - MPU6050
+   - TinyGPS++
+   - Adafruit NeoPixel
+4. Select port → Upload
 
 ---
 
-## Testing & Calibration
-- Modify threshold values inside code:
+## Threshold Tuning
+Edit inside main sketch:
 ```cpp
-float crashSensitivity = 3.5;  // Adjust based on tests
-int speedLimit = 60;           // km/h
-float tiltThreshold = 18;      // degrees
+#define SPEED_LIMIT        1.0   // km/h
+#define TILT_THRESHOLD     15000
+#define TILT_HYSTERESIS    3000
 ```
 
 ---
 
-## Future Improvements
-- Add fall detection with timer cancel button
-- Bluetooth mobile app dashboard
-- Helmet strap sensor (disable engine until strapped)
-- IoT MQTT integration
-
----
-
-## Contributions
-Pull requests, ideas and improvements are welcome!
+## Contribute
+Spotted a bug or want to add Bluetooth/app support?
+Feel free to create a Pull Request
 
 ---
 
